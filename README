@@ -1,0 +1,50 @@
+basic pi setup:
+$ sudo -s
+# apt-get update
+# apt-get upgrade
+# wpa_passphrase <SSID> <PASSPHRASE> >> /etc/network/interfaces
+# vi /etc/network/interfaces
+# # change to dhcp
+# # add wpa-ssid <SSID>
+# # add wpa-psk <PSK>
+# raspi-config
+# # expand filesystem
+# # advanced > spi > enable
+# # advanced > hostname > sousvide
+# # reboot
+
+copy rust to pi:
+$ # download rust from https://github.com/warricksothr/RustBuild
+$ scp *nightly*.tar.gz pi@192.168.1.89:
+
+rust setup on pi:
+$ sudo apt-get install git
+$ git clone --recursive https://github.com/brson/multirust
+$ cd multirust
+$ git submodule update --init
+$ ./build.sh
+$ sudo ./install.sh
+$ cd
+$ sudo -s
+# mkdir -p /opt/rust/nightly
+# tar -C /opt/rust/nightly -zxf rust-*.tar.gz
+# tar -C /opt/rust/nightly -zxf rustlib-*.tar.gz
+# tar -C /opt/rust/nightly -zxf cargo-*.tar.gz
+# chown -R root:users /opt/rust
+# chmod -R 775 /opt/rust
+# multirust update unofficial-nightly --link-local /opt/rust/nightly
+# multirust default unofficial-nightly
+# exit
+$ multirust update unofficial-nightly --link-local /opt/rust/nightly
+$ multirust default unofficial-nightly
+$ rm *.tar.gz
+
+setup sousvide code:
+$ ssh-keygen
+$ cat ~/.ssh/id_rsa.pub
+$ # add public key to github
+$ git clone git@github.com:jtdubs/sousvide.git
+$ cd sousvide
+
+setup environment:
+$ sudo iptables -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-port 8080
