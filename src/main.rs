@@ -10,6 +10,7 @@ pub mod sousvide;
 use std::f32;
 use std::sync::{Mutex};
 use std::thread::{spawn, sleep};
+use std::process::{Command,exit};
 
 use nickel::{Nickel, HttpRouter, StaticFilesHandler, JsonBody};
 use rustc_serialize::json;
@@ -47,7 +48,9 @@ fn main() {
 	});
 
 	let mut server = Nickel::new();
+
 	server.utilize(StaticFilesHandler::new("public/"));
+
 	server.get("/rest/state", middleware!(|_req| {
 		let sv = SOUSVIDE.lock().unwrap();
 		json::encode(
@@ -58,10 +61,32 @@ fn main() {
 				set_temp: sv.get_set_temp().unwrap_or(f32::NAN)
 			}).unwrap()
 	}));
-	server.get("/rest/state/heater",   middleware!(|_| { json::encode(&SOUSVIDE.lock().unwrap().get_heater_state()).unwrap()}));
-	server.get("/rest/state/pump",     middleware!(|_| { json::encode(&SOUSVIDE.lock().unwrap().get_pump_state()).unwrap()}));
-	server.get("/rest/state/cur_temp", middleware!(|_| { json::encode(&SOUSVIDE.lock().unwrap().get_cur_temp().unwrap_or(f32::NAN)).unwrap()}));
-	server.get("/rest/state/set_temp", middleware!(|_| { json::encode(&SOUSVIDE.lock().unwrap().get_set_temp().unwrap_or(f32::NAN)).unwrap()}));
+	server.get("/rest/state/heater",   middleware!(|_| {
+		let state = &SOUSVIDE.lock().unwrap().get_heater_state();
+		json::encode(state).unwrap())
+	}));
+	server.get("/rest/state/pump",     middleware!(|_| {
+		let state = &SOUSVIDE.lock().unwrap().get_pump_state();
+		json::encode(state).unwrap())
+	}));
+	server.get("/rest/state/cur_temp", middleware!(|_| {
+		let temp = &SOUSVIDE.lock().unwrap().get_cur_temp().unwrap_or(f32::NAN);
+		json::encode(temp).unwrap()
+	}));
+	server.get("/rest/state/set_temp", middleware!(|_| {
+		let temp = &SOUSVIDE.lock().unwrap().get_set_temp().unwrap_or(f32::NAN);
+		json::encode(temp).unwrap()
+	}));
+	server.get("/rest/version",        middleware!(|_| {
+		let output = Command::new("git").arg("rev-parse").arg("@").output().unwrap_or_else(|e| {
+			panic!("failed to execute process: {}", e)
+		});
+
+		let stdout = String::from_utf8_lossy(&output.stdout);
+		println!("git revision: {}", stdout);
+		json::encode(&stdout).unwrap()
+	}));
+
 	server.put("/rest/state/set_temp", middleware!(|req| {
 		let body = req.json_as::<SetTempBody>();
 		if body.is_ok() {
@@ -70,5 +95,12 @@ fn main() {
 			SOUSVIDE.lock().unwrap().clear_set_temp();
 		}
 	}));
+	server.put("/shutdown", middleware!(|req| {
+		exit(0);
+	}));
+	server.put("/reboot", middleware!(|req| {
+		exit(1);
+	}));
+
 	server.listen("0.0.0.0:8080");
 }

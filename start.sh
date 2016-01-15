@@ -9,4 +9,10 @@ if [ $LOCAL != $REMOVE ]; then
 	git pull && cargo build
 fi
 
-./target/debug/sousvide &
+./target/debug/sousvide
+
+if [ $? == 0 ]; then
+	sudo shutdown
+else
+	sudo reboot
+fi

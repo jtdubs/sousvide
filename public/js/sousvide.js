@@ -24,9 +24,18 @@ function setTemp() {
   });
 }
 
-function reset() {
-  $("#new_temp").val("");
-  setTemp();
+function reboot() {
+  $.ajax({
+    url: "/reboot",
+    type: 'PUT',
+  });
+}
+
+function shutdown() {
+  $.ajax({
+    url: "/shutdown",
+    type: 'PUT',
+  });
 }
 
 $(function() {
@@ -40,8 +49,14 @@ $(function() {
       }
   });
 
+  $.getJSON("/rest/version", function (data) {
+    $("#version").html("Version: " + data);
+  });
+
   setInterval(refresh, 1000);
 
   $("#set_temp_button").click(setTemp);
   $("#reset_button").click(reset);
+  $("#reboot").click(reboot);
+  $("#shutdown").click(shutdown);
 });
