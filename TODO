@@ -1,0 +1,7 @@
+startup:
+git pull
+cargo run
+
+web interface:
+add revision text to HTML via ajax call to 'git log' or equivalent
+add update link to HTML that has backend do (git pull && reboot)

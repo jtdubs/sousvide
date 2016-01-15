@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sous Vide</title>
+  <script src="js/jquery-2.1.4.min.js"></script>
+  <script src="js/sousvide.js"></script>
+</head>
+<body>
+  <h1>Sous Vide</h1>
+  <table border=1>
+    <tr><th>Param</th><th>Value</th></tr>
+    <tr><td>Set Temp</td><td><div id="set_temp_label"></div></td></tr>
+    <tr><td>Cur Temp</td><td><div id="cur_temp_label"></div></td></tr>
+    <tr><td>Pump    </td><td><div id="pump_label">    </div></td></tr>
+    <tr><td>Heater  </td><td><div id="heater_label">  </div></td></tr>
+  </table>
+  <br/>
+  <div id="control_form">
+    Set Temp:
+    <input type="text" value="130" id="new_temp"/>&#x2109;
+    <button type="button" id="set_temp_button"/>Update</button>
+    <button type="button" id="reset_button"/>Reset</button>
+  </div>
+  <hr>
+  <a href="sousvide.log">log file</a>
+</body>
+</html>

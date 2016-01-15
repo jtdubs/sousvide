@@ -1,0 +1,9 @@
+[package]
+name = "sousvide"
+version = "0.1.0"
+authors = ["Justin Dubs <jtdubs@gmail.com>"]
+
+[dependencies]
+nickel = "*"
+rustc-serialize = "0.3.16"
+lazy_static = "0.1.15"
