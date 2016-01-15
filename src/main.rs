@@ -51,7 +51,7 @@ fn main() {
 
 	server.utilize(StaticFilesHandler::new("public/"));
 
-	server.get("/rest/state", middleware!(|_req| {
+	server.get("/rest/state", middleware!(|_| {
 		let sv = SOUSVIDE.lock().unwrap();
 		json::encode(
 			& State {
@@ -63,11 +63,11 @@ fn main() {
 	}));
 	server.get("/rest/state/heater",   middleware!(|_| {
 		let state = &SOUSVIDE.lock().unwrap().get_heater_state();
-		json::encode(state).unwrap())
+		json::encode(state).unwrap()
 	}));
 	server.get("/rest/state/pump",     middleware!(|_| {
 		let state = &SOUSVIDE.lock().unwrap().get_pump_state();
-		json::encode(state).unwrap())
+		json::encode(state).unwrap()
 	}));
 	server.get("/rest/state/cur_temp", middleware!(|_| {
 		let temp = &SOUSVIDE.lock().unwrap().get_cur_temp().unwrap_or(f32::NAN);
@@ -95,10 +95,10 @@ fn main() {
 			SOUSVIDE.lock().unwrap().clear_set_temp();
 		}
 	}));
-	server.put("/shutdown", middleware!(|req| {
+	server.put("/shutdown", middleware!(|_| {
 		exit(0);
 	}));
-	server.put("/reboot", middleware!(|req| {
+	server.put("/reboot", middleware!(|_| {
 		exit(1);
 	}));
 

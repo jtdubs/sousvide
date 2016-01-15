@@ -1,4 +1,4 @@
-use std::fs::{metadata, File, OpenOptions};
+use std::fs::{File, OpenOptions};
 use std::io::{Seek, SeekFrom, Write, Read};
 use std::result;
 
