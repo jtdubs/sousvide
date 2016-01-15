@@ -17,12 +17,13 @@ impl Pin {
 		let value_path = format!("/sys/class/gpio/gpio{}/value", port);
 		let direction_path = format!("/sys/class/gpio/gpio{}/direction", port);
 
+		/*
 		let md = metadata(&format!("/sys/class/gpio/gpio{}", port));
 		if md.is_err() {
 			let mut export_file = OpenOptions::new().write(true).open("/sys/class/gpio/export").unwrap();
 			try!(write!(export_file, "{}", port).or(Err("unable to export gpio")));
 		}
-	
+		*/
 
 		let mut value_file = OpenOptions::new().write(true).open(value_path.clone()).unwrap();
 		let mut direction_file = OpenOptions::new().write(true).open(direction_path).unwrap();
@@ -70,9 +71,11 @@ impl Pin {
 	}
 }
 
+/*
 impl Drop for Pin {
 	fn drop(&mut self) {
 		let mut unexport_file = OpenOptions::new().write(true).open("/sys/class/gpio/unexport").unwrap();
 		drop(write!(unexport_file, "{}", self.port).or(Err("unable to unexport gpio")))
 	}
 }
+*/
