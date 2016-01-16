@@ -1,5 +1,8 @@
 #![feature(time2)] 
 
+//
+// imports
+//
 #[macro_use] extern crate nickel;
 #[macro_use] extern crate lazy_static;
 extern crate rustc_serialize;
@@ -16,10 +19,18 @@ use nickel::{Nickel, HttpRouter, StaticFilesHandler, JsonBody};
 use rustc_serialize::json;
 use sousvide::SousVide;
 
+//
+// hardware definitions
+//
 const THERMOCOUPLE_SPI_DEV: &'static str = "/dev/spidev0.0";
 const HEATER_PIN: u8 = 17;
 const PUMP_PIN: u8 = 27;
 
+//
+// State structure
+//
+// This structure is serialiezd as json to send back to the web page upon request.
+//
 #[derive(RustcEncodable)]
 struct State {
 	heater : bool,
@@ -28,29 +39,46 @@ struct State {
 	set_temp : f32
 }
 
+//
+// SetTempBody structure
+//
+// This structure is deserialized from the PUT request to set the temperature.
+//
 #[derive(RustcDecodable)]
 struct SetTempBody {
 	value : f32
 }
 
+//
+// singleton sousvide instance
+//
 lazy_static! {
 	static ref SOUSVIDE : Mutex<SousVide> = Mutex::new(SousVide::new(THERMOCOUPLE_SPI_DEV, PUMP_PIN, HEATER_PIN));
 }
 
+//
+// main entry point
+//
 fn main() {
+	// create a background thread to manage the sousvide logic
 	spawn(move || {
 		loop {
+			// step the sousvide
 			let delay = SOUSVIDE.lock().unwrap().step();
+			// if a delay before the next step was requested, respect it
 			if delay.is_some() {
 				sleep(delay.unwrap());
 			}
 		}
 	});
 
+	// create the web server
 	let mut server = Nickel::new();
 
+	// serve static content out of the public/ folder
 	server.utilize(StaticFilesHandler::new("public/"));
 
+	// add request handlers
 	server.get("/rest/state", middleware!(|_| {
 		let sv = SOUSVIDE.lock().unwrap();
 		json::encode(
@@ -83,7 +111,6 @@ fn main() {
 		});
 
 		let stdout = String::from_utf8_lossy(&output.stdout);
-		println!("git revision: {}", stdout);
 		json::encode(&stdout).unwrap()
 	}));
 
@@ -102,5 +129,6 @@ fn main() {
 		exit(1);
 	}));
 
+	// start the server
 	server.listen("0.0.0.0:8080");
 }

@@ -1,3 +1,6 @@
+//
+// imports
+//
 use std::fmt;
 use std::fs::File;
 use std::path::Path;
@@ -6,10 +9,16 @@ use std::io::Read;
 
 pub type Result<T> = result::Result<T, &'static str>;
 
+//
+// Thermocouple struct
+//
 pub struct Thermocouple {
-	spi: File,
+	spi: File, // the spidev interface to this thermocouple
 }
 
+//
+// Sample struct
+//
 #[allow(dead_code)]
 pub struct Sample {
 	oc_fault: bool,               // open (no connections)
@@ -21,6 +30,9 @@ pub struct Sample {
 }
 
 impl Thermocouple {
+	//
+	// open(path) - open thermocouple attached to the specified spidev file
+	//
 	pub fn open<P: AsRef<Path>>(path: P) -> Result<Thermocouple> {
 		match File::open(path) {
 			Ok(f) => Ok(Thermocouple { spi: f }),
@@ -28,6 +40,9 @@ impl Thermocouple {
 		}
 	}
 
+	//
+	// read_sample() - read and return a sample from the thermocouple
+	//
 	pub fn read_sample(&mut self) -> Result<Sample> {
 		let mut buf = [0u8; 4];
 		match self.spi.read(&mut buf) {
@@ -47,6 +62,9 @@ impl Thermocouple {
 }
 
 impl Sample {
+	//
+	// new(raw) - constructs a sample from the 32-bit value read from the thermocouple
+	//
 	pub fn new(raw: u32) -> Sample {
 		Sample {
 			oc_fault: (raw >> 0) & 0x01 == 0x01,
@@ -58,6 +76,9 @@ impl Sample {
 		}
 	}
 
+	//
+	// get_temp_celcius() - calculate and return the temperature in celcius
+	//
 	pub fn get_temp_celcius(&self) -> Option<f32> {
 		if self.fault {
 			None
@@ -66,6 +87,9 @@ impl Sample {
 		}
 	}
 
+	//
+	// get_temp_fahrenheit() - calculate and return the temperature in fahrenheit
+	//
 	pub fn get_temp_fahrenheit(&self) -> Option<f32> {
 		if self.fault {
 			None

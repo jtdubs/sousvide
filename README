@@ -52,5 +52,5 @@ sudo iptables -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-port 8080
 # export gpio pins
 echo 17 > /sys/class/gpio/export
 echo 27 > /sys/class/gpio/export
-# Update sousvide code
-sudo -u pi "cd ~/sousvide && ./start.sh > public/sousvide.log"
+# start sousvide
+nohup su pi -l -c "cd ~/sousvide && ./start.sh > public/sousvide.log" &
