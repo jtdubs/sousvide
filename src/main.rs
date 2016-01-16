@@ -122,11 +122,9 @@ fn main() {
 			SOUSVIDE.lock().unwrap().clear_set_temp();
 		}
 	}));
-	server.put("/shutdown", middleware!(|_| {
+	server.put("/update", middleware!(|_| {
+		SOUSVIDE.lock().unwrap().clear_set_temp();
 		exit(0);
-	}));
-	server.put("/reboot", middleware!(|_| {
-		exit(1);
 	}));
 
 	// start the server

@@ -17,7 +17,7 @@ pub enum State { Low, High }
 // Pin struct - represents a GPIO pin
 //
 pub struct Pin {
-	port : u8,
+	_port : u8,
 	file : File,
 }
 
@@ -58,7 +58,7 @@ impl Pin {
 
 		// return the pin
 		Ok(Pin {
-			port: port,
+			_port: port,
 			file: value_file,
 		})
 	}

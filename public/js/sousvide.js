@@ -24,16 +24,9 @@ function setTemp() {
   });
 }
 
-function reboot() {
-  $.ajax({
-    url: "/reboot",
-    type: 'PUT',
-  });
-}
-
 function shutdown() {
   $.ajax({
-    url: "/shutdown",
+    url: "/update",
     type: 'PUT',
   });
 }
@@ -57,6 +50,5 @@ $(function() {
 
   $("#set_temp_button").click(setTemp);
   $("#reset_button").click(reset);
-  $("#reboot").click(reboot);
-  $("#shutdown").click(shutdown);
+  $("#update").click(update);
 });
