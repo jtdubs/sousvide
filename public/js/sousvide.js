@@ -24,6 +24,11 @@ function setTemp() {
   });
 }
 
+function reset() {
+  $("#new_temp").val("");
+  setTemp();
+}
+
 function shutdown() {
   $.ajax({
     url: "/update",
